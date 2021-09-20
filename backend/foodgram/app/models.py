@@ -5,24 +5,19 @@ from pytils.translit import slugify
 User = get_user_model()
 
 
-class Recipe(models.Model):
-    author = models.ForeignKey(User, related_name='recipes',
-                               on_delete=models.CASCADE,
-                               verbose_name='Автор рецепта')
-    name = models.CharField(max_length=200, verbose_name='Название')
-    image = models.ImageField(verbose_name='Ссылка на картинку на сайте')
-    text = models.TextField(verbose_name='Описание')
-    cooking_time = models.IntegerField(
-        verbose_name='Время приготовления (мин)')
-    pub_date = models.DateTimeField(verbose_name='Дата публикации',
-                                    auto_now_add=True)
-
-
 class Tag(models.Model):
-    name = models.CharField(verbose_name='Название', max_length=200)
-    color = models.CharField(verbose_name='Цвет в HEX', max_length=7)
-    slug = models.CharField(verbose_name='Уникальный слаг', max_length=200,
-                            unique=True)
+    """Теги"""
+    name = models.CharField('Название тега', max_length=200)
+    color = models.CharField('Цвет в HEX', max_length=7)
+    slug = models.SlugField(
+        'Уникальный слаг', max_length=200, unique=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -30,44 +25,72 @@ class Tag(models.Model):
         super().save(*args, **kwargs)
 
 
-class Tags(models.Model):
-    tag = models.ForeignKey(Tag, related_name='recipes',
-                            on_delete=models.CASCADE,
-                            verbose_name='Список рецептов')
-    recipe = models.ForeignKey(Recipe, related_name='tags',
-                               on_delete=models.CASCADE,
-                               verbose_name='Список тегов')
-
-
 class Ingredient(models.Model):
-    name = models.CharField(verbose_name='Название', max_length=200)
-    measurement_unit = models.CharField(verbose_name='Единицы измерения',
-                                        max_length=200)
+    """Ингридиенты"""
+    name = models.CharField('Название', max_length=200)
+    measurement_unit = models.CharField('Единицы измерения', max_length=200)
+
+    def __str__(self):
+        return f'{self.name}, {self.measurement_unit}'
+
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
 
 
-class Ingredients(models.Model):
-    ingredient = models.ForeignKey(Ingredient, related_name='recipes',
-                                   on_delete=models.CASCADE,
-                                   verbose_name='Список рецептов')
-    recipe = models.ForeignKey(Recipe, related_name='ingredients',
-                               on_delete=models.CASCADE,
-                               verbose_name='Список ингредиентов')
-    amount = models.IntegerField(verbose_name='Количество')
+class Recipe(models.Model):
+    """Рецепты"""
+    author = models.ForeignKey(
+        User, related_name='recipes', on_delete=models.CASCADE,
+        verbose_name='Автор рецепта',)
+    name = models.CharField('Название рецепта', max_length=200,)
+    image = models.ImageField('Ссылка на картинку', upload_to='image/')
+    text = models.TextField('Описание')
+    cooking_time = models.IntegerField('Время приготовления (мин)')
+    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
+    ingredients = models.ManyToManyField(
+        Ingredient, through='RecipeIngredients', verbose_name='Ингредиенты',)
+    tags = models.ManyToManyField(Tag, verbose_name='Теги',)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+
+
+class RecipeIngredients(models.Model):
+    """Ингредиенты рецептов"""
+    ingredient = models.ForeignKey(
+        Ingredient, on_delete=models.CASCADE, verbose_name='Ингредиент')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,)
+    amount = models.PositiveSmallIntegerField('Количество',)
 
 
 class Shopping_cart(models.Model):
-    recipe = models.ForeignKey(Recipe, related_name='shopping_carts',
-                               on_delete=models.CASCADE,
-                               verbose_name='Список покупок')
-    user = models.ForeignKey(User, related_name='shopping_carts',
-                             on_delete=models.CASCADE,
-                             verbose_name='Список покупок')
+    """Список покупок"""
+    recipe = models.ForeignKey(
+        Recipe, related_name='shopping_carts', on_delete=models.CASCADE,
+        verbose_name='Рецепт',)
+    user = models.ForeignKey(
+        User, related_name='shopping_carts', on_delete=models.CASCADE,
+        verbose_name='Пользователь',)
+
+    class Meta:
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Список покупок'
 
 
 class Favorite(models.Model):
-    user = models.ForeignKey(User, related_name='favorites',
-                             on_delete=models.CASCADE,
-                             verbose_name='Избранные')
-    recipe = models.ForeignKey(Recipe, related_name='favorites',
-                               on_delete=models.CASCADE,
-                               verbose_name='Избранные')
+    """Избранные рецепты"""
+    user = models.ForeignKey(
+        User, related_name='favorites', on_delete=models.CASCADE,
+        verbose_name='Пользователь',)
+    recipe = models.ForeignKey(
+        Recipe, related_name='favorites', on_delete=models.CASCADE,
+        verbose_name='Рецепт',)
+
+    class Meta:
+        verbose_name = 'Избранные рецепты'
+        verbose_name_plural = 'Избранные рецепты'
