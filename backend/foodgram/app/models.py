@@ -58,6 +58,7 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ('-pub_date',)
 
 
 class RecipeIngredients(models.Model):
@@ -94,3 +95,18 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'Избранные рецепты'
         verbose_name_plural = 'Избранные рецепты'
+
+
+class UserSubscribe(models.Model):
+    """Подписка на пользователя"""
+    user = models.ForeignKey(
+        User, related_name='followers', on_delete=models.CASCADE,
+        verbose_name='Подписчик')
+    author = models.ForeignKey(
+        User, related_name='following', on_delete=models.CASCADE,
+        verbose_name='Подписки')
+
+    constraints = (
+        models.UniqueConstraint(
+            fields=('user', 'following'), name='unique_following'),
+    )
