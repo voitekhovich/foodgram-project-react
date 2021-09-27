@@ -10,7 +10,7 @@ from .serializers import (
     ShoppingCardSerializer)
 
 
-class StandardResultsSetPagination(PageNumberPagination):
+class SetLimitPagination(PageNumberPagination):
     page_size = 6
     page_size_query_param = 'limit'
     max_page_size = 100
@@ -19,7 +19,7 @@ class StandardResultsSetPagination(PageNumberPagination):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    pagination_class = StandardResultsSetPagination
+    pagination_class = SetLimitPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
