@@ -99,6 +99,9 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.AllowAny',
+    # ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
     ),
@@ -110,6 +113,8 @@ DJOSER = {
     'SERIALIZERS': {
         'user_create': 'foodgram.serializers.SpecialUserSerializer',
         'user': 'foodgram.serializers.SubscribeUserSerializer',
+        'current_user': 'foodgram.serializers.SubscribeUserSerializer',
+        # 'subscriptions': 'foodgram.serializers.SubscriptionsSerializer',
     },
 }
 

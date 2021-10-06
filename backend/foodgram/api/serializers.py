@@ -2,7 +2,10 @@ from app.models import (
     Favorite, Recipe, RecipeIngredients, Shopping_cart, Tag, Ingredient,
     UserSubscribe)
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
+import base64
 
 User = get_user_model()
 
@@ -45,6 +48,22 @@ class RecipeIngredientsSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
 
+class ImageBase64Serializer(serializers.BaseSerializer):
+    def to_representation(self, value):
+        return value
+
+    def to_internal_value(self, data):
+        if not data:
+            raise serializers.ValidationError({
+                'image': 'Это поле обязательно к заполнению.'
+            })
+
+        format, imgstr = data.split(';base64,')
+        ext = format.split('/')[-1]
+
+        return ContentFile(base64.b64decode(imgstr), name='image.' + ext)
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializer(read_only=True)
@@ -52,6 +71,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         source='recipeingredients_set', many=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
+    image = ImageBase64Serializer()
 
     class Meta:
         model = Recipe
@@ -72,7 +92,14 @@ class RecipeSerializer(serializers.ModelSerializer):
         return Shopping_cart.objects.filter(user=user, recipe=obj).exists()
 
 
-class ShoppingCardSerializer(serializers.ModelSerializer):
+class RecipeShoppingCartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Shopping_cart.objects.all(),
+                fields=('recipe', 'user')
+            )
+        ]

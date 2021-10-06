@@ -32,3 +32,10 @@ class SubscribeUserSerializer(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
         return UserSubscribe.objects.filter(user=user, author=obj).exists()
+
+
+class SubscriptionsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('author__email', 'author__id', 'author__username',
+                  'author__first_name', 'author__last_name',)

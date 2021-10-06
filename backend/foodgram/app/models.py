@@ -81,6 +81,12 @@ class Shopping_cart(models.Model):
     class Meta:
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Список покупок'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'user'],
+                name='unique_recipe_user'
+            )
+        ]
 
 
 class Favorite(models.Model):
@@ -95,6 +101,12 @@ class Favorite(models.Model):
     class Meta:
         verbose_name = 'Избранные рецепты'
         verbose_name_plural = 'Избранные рецепты'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_user_recipe'
+            )
+        ]
 
 
 class UserSubscribe(models.Model):
@@ -106,7 +118,12 @@ class UserSubscribe(models.Model):
         User, related_name='following', on_delete=models.CASCADE,
         verbose_name='Подписки')
 
-    constraints = (
-        models.UniqueConstraint(
-            fields=('user', 'following'), name='unique_following'),
-    )
+    class Meta:
+        verbose_name = 'Подписка на пользователя'
+        verbose_name_plural = 'Подписка на пользователя'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'author'],
+                name='unique_user_author'
+            )
+        ]
