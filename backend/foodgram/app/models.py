@@ -3,11 +3,12 @@ from django.contrib.auth import get_user_model
 from pytils.translit import slugify
 
 User = get_user_model()
+User._meta.get_field('email')._unique = True
 
 
 class Tag(models.Model):
     """Теги"""
-    name = models.CharField('Название тега', max_length=200)
+    name = models.CharField('Название тега', unique=True, max_length=200)
     color = models.CharField('Цвет в HEX', max_length=7)
     slug = models.SlugField(
         'Уникальный слаг', max_length=200, unique=True, blank=True)
@@ -27,7 +28,7 @@ class Tag(models.Model):
 
 class Ingredient(models.Model):
     """Ингридиенты"""
-    name = models.CharField('Название', max_length=200)
+    name = models.CharField('Название', unique=True, max_length=200)
     measurement_unit = models.CharField('Единицы измерения', max_length=200)
 
     def __str__(self):
@@ -44,7 +45,8 @@ class Recipe(models.Model):
         User, related_name='recipes', on_delete=models.CASCADE,
         verbose_name='Автор рецепта',)
     name = models.CharField('Название рецепта', max_length=200,)
-    image = models.ImageField('Ссылка на картинку', upload_to='image/')
+    image = models.ImageField('Ссылка на картинку', upload_to='image/',
+                              blank=True, null=True,)
     text = models.TextField('Описание')
     cooking_time = models.IntegerField('Время приготовления (мин)')
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
@@ -66,7 +68,17 @@ class RecipeIngredients(models.Model):
     ingredient = models.ForeignKey(
         Ingredient, on_delete=models.CASCADE, verbose_name='Ингредиент')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,)
-    amount = models.PositiveSmallIntegerField('Количество',)
+    amount = models.IntegerField('Количество',)
+
+    class Meta:
+        verbose_name = 'Ингредиенты рецептов'
+        verbose_name_plural = 'Ингредиенты рецептов'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ingredient', 'recipe'],
+                name='unique_ingredient_recipe'
+            )
+        ]
 
 
 class Shopping_cart(models.Model):
