@@ -14,7 +14,7 @@ services:
     env_file:
       - ../backend/.env
   
-  backend:
+  web:
     build: ../backend
     restart: always 
     volumes:
@@ -34,7 +34,7 @@ services:
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
-      - backend
+      - web
   
   nginx:
     image: nginx:1.19.3
@@ -48,4 +48,4 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
-      - backend
+      - web
