@@ -5,7 +5,8 @@ from app.models import (
 from .permissions import IsOwnerOrReadOnly
 from .filters import RecipeFilter
 from .serializers import (
-    RecipeCreateSerializer, RecipeSerializer, TagSerializer,
+    RecipeCreateSerializer, RecipeSerializer, SubscriptionsSerializer,
+    TagSerializer,
     RecipeShoppingCartSerializer,
     IngredientSerializer)
 from .services import create_pdf
@@ -39,15 +40,19 @@ class SetLimitPagination(PageNumberPagination):
 
 class CustomUserViewSet(UserViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                          IsOwnerOrReadOnly)
+                          )
     pagination_class = SetLimitPagination
+
+    def get_serializer_class(self):
+        if self.action == 'subscriptions':
+            return SubscriptionsSerializer
+        return super().get_serializer_class()
 
     @action(detail=False)
     def subscriptions(self, request):
         """Список авторов, на которых подписан пользователь"""
         user = request.user
         authors = User.objects.filter(following__user=user)
-        print(authors)
         serializer = self.get_serializer(authors, many=True)
         return Response(serializer.data)
 
@@ -77,7 +82,8 @@ class CustomUserViewSet(UserViewSet):
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = SetLimitPagination
-    permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
