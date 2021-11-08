@@ -1,3 +1,4 @@
+from foodgram.settings import STATIC_ROOT
 from pathlib import Path
 import io
 from borb.pdf.canvas.layout.page_layout.multi_column_layout import SingleColumnLayout
@@ -14,7 +15,8 @@ def create_pdf(shop_list):
     page = Page()
     pdf.append_page(page)
     layout = SingleColumnLayout(page)
-    font_path: Path = Path(__file__).parent / 'arial.ttf'
+    # font_path: Path = Path(__file__).parent / 'arial.ttf'
+    font_path: Path = Path(STATIC_ROOT) / 'arial.ttf'
     font: Font = TrueTypeFont.true_type_font_from_file(font_path)
     for item in shop_list:
         text = (f'• {item["ingredient__name"]} '

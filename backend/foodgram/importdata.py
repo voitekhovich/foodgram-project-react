@@ -1,7 +1,7 @@
 import csv
 from app.models import Ingredient
 
-filename = '../data/ingredients.csv'
+filename = './data/ingredients.csv'
 
 
 def load():

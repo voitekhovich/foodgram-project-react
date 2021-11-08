@@ -3,7 +3,7 @@ from app.models import (
     UserSubscribe)
 
 from .permissions import IsOwnerOrReadOnly
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientFilter
 from .serializers import (
     RecipeCreateSerializer, RecipeSerializer, SubscriptionsSerializer,
     TagSerializer,
@@ -19,7 +19,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import serializers, permissions, viewsets, status
 from rest_framework.decorators import action
-from rest_framework import filters
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
@@ -40,7 +39,7 @@ class SetLimitPagination(PageNumberPagination):
 
 class CustomUserViewSet(UserViewSet):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                          )
+                          IsOwnerOrReadOnly)
     pagination_class = SetLimitPagination
 
     def get_serializer_class(self):
@@ -53,6 +52,12 @@ class CustomUserViewSet(UserViewSet):
         """Список авторов, на которых подписан пользователь"""
         user = request.user
         authors = User.objects.filter(following__user=user)
+
+        page = self.paginate_queryset(authors)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
         serializer = self.get_serializer(authors, many=True)
         return Response(serializer.data)
 
@@ -153,5 +158,6 @@ class TagViewSet(viewsets.ReadOnlyModelViewSet):
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ('^name',)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = IngredientFilter

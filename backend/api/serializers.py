@@ -1,7 +1,7 @@
 from app.models import (
     Favorite, Recipe, RecipeIngredients, Shopping_cart, Tag, Ingredient,
     UserSubscribe)
-
+from foodgram.settings import MEDIA_URL
 import base64
 
 from django.contrib.auth import get_user_model
@@ -57,15 +57,20 @@ class SubscribeUserSerializer(serializers.ModelSerializer):
 
 
 class RecipesSubscriptions(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
+
+    def get_image(self, obj):
+        return f'{MEDIA_URL}{obj.image.name}'
 
 
 class SubscriptionsSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
-    recipes = RecipesSubscriptions(many=True, read_only=True)
+    recipes = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -78,6 +83,13 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
         return UserSubscribe.objects.filter(user=user, author=obj).exists()
+
+    def get_recipes(self, obj):
+        recipes_limit = int(self.context['request'].query_params.get(
+            'recipes_limit', None))
+        items = Recipe.objects.filter(author=obj)[:recipes_limit]
+        serializer = RecipesSubscriptions(instance=items, many=True)
+        return serializer.data
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
@@ -131,6 +143,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         source='recipeingredients_set', many=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
@@ -149,6 +162,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         if user.is_anonymous:
             return False
         return Shopping_cart.objects.filter(user=user, recipe=obj).exists()
+
+    def get_image(self, obj):
+        return f'{MEDIA_URL}{obj.image.name}'
 
 
 """Создание рецепта"""
@@ -233,6 +249,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 
 class RecipeShoppingCartSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
@@ -243,3 +261,6 @@ class RecipeShoppingCartSerializer(serializers.ModelSerializer):
                 fields=('recipe', 'user')
             )
         ]
+
+    def get_image(self, obj):
+        return f'{MEDIA_URL}{obj.image.name}'
