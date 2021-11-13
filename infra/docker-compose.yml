@@ -20,6 +20,7 @@ services:
     volumes:
       - static_value:/code/static
       - media_value:/code/media
+      - ../backend/static/arial.ttf:/code/static/arial.ttf
       - ../data:/code/data
     ports:
       - "8000:8000"

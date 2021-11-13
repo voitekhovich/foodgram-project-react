@@ -30,12 +30,15 @@ class RecipeFilter(filters.FilterSet):
         user = self.request.user
         if value and not user.is_anonymous:
             return queryset.filter(**{'shopping_carts__user': user})
-        return queryset
+        return Ingredient.objects.filter
 
 
 class IngredientFilter(filters.FilterSet):
-    name = filters.CharFilter(lookup_expr='istartswith')
+    name = filters.CharFilter(field_name='name', method='name_lower')
 
     class Meta:
         model = Ingredient
         fields = ('name',)
+
+    def name_lower(self, queryset, name, value):
+        return queryset.filter(name__istartswith=value.lower())

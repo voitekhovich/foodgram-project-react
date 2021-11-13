@@ -2,6 +2,9 @@ from app.models import (
     Ingredient, Recipe, RecipeIngredients, Shopping_cart, Tag, Favorite,
     UserSubscribe)
 
+from foodgram.settings import (
+    PAGE_SIZE, MAX_PAGE_SIZE, PAGE_SIZE_QUERY_PARAM, PDF_FILE_NAME)
+
 from .permissions import IsOwnerOrReadOnly
 from .filters import RecipeFilter, IngredientFilter
 from .serializers import (
@@ -29,9 +32,9 @@ User = get_user_model()
 
 
 class SetLimitPagination(PageNumberPagination):
-    page_size = 6
-    page_size_query_param = 'limit'
-    max_page_size = 100
+    page_size = PAGE_SIZE
+    page_size_query_param = PAGE_SIZE_QUERY_PARAM
+    max_page_size = MAX_PAGE_SIZE
 
 
 """Пользователи"""
@@ -95,7 +98,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ('shopping_cart', 'favorite'):
             return RecipeShoppingCartSerializer
-        if self.action in ('create', 'update'):
+        if self.action in ('create', 'update', 'partial_update'):
             return RecipeCreateSerializer
         return RecipeSerializer
 
@@ -110,7 +113,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             .annotate(Sum('amount')).order_by()
         buffer = create_pdf(shop_list)
         return FileResponse(
-            buffer, as_attachment=True, filename='shoplist.pdf')
+            buffer, as_attachment=True, filename=PDF_FILE_NAME)
 
     @action(detail=True, methods=('get', 'delete'))
     def shopping_cart(self, request, pk=None):

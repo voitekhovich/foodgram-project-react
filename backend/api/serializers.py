@@ -1,7 +1,7 @@
 from app.models import (
     Favorite, Recipe, RecipeIngredients, Shopping_cart, Tag, Ingredient,
     UserSubscribe)
-from foodgram.settings import MEDIA_URL
+from foodgram.settings import MEDIA_URL, IMG_FILE_NAME
 import base64
 
 from django.contrib.auth import get_user_model
@@ -11,6 +11,17 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 User = get_user_model()
+
+
+def get_is_subscribed(self, obj):
+    user = self.context.get('request').user
+    if user.is_anonymous:
+        return False
+    return UserSubscribe.objects.filter(user=user, author=obj).exists()
+
+
+def get_image(self, obj):
+    return f'{MEDIA_URL}{obj.image.name}'
 
 
 """Пользователи"""
@@ -50,10 +61,7 @@ class SubscribeUserSerializer(serializers.ModelSerializer):
                   'is_subscribed')
 
     def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return UserSubscribe.objects.filter(user=user, author=obj).exists()
+        return get_is_subscribed(self, obj)
 
 
 class RecipesSubscriptions(serializers.ModelSerializer):
@@ -64,7 +72,7 @@ class RecipesSubscriptions(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
     def get_image(self, obj):
-        return f'{MEDIA_URL}{obj.image.name}'
+        return get_image(self, obj)
 
 
 class SubscriptionsSerializer(serializers.ModelSerializer):
@@ -79,10 +87,7 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
                   'recipes', 'recipes_count')
 
     def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return UserSubscribe.objects.filter(user=user, author=obj).exists()
+        return get_is_subscribed(self, obj)
 
     def get_recipes(self, obj):
         recipes_limit = int(self.context['request'].query_params.get(
@@ -104,10 +109,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'is_subscribed')
 
     def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user.is_anonymous:
-            return False
-        return UserSubscribe.objects.filter(user=user, author=obj).exists()
+        return get_is_subscribed(self, obj)
 
 
 """Рецепты"""
@@ -164,7 +166,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         return Shopping_cart.objects.filter(user=user, recipe=obj).exists()
 
     def get_image(self, obj):
-        return f'{MEDIA_URL}{obj.image.name}'
+        return get_image(self, obj)
 
 
 """Создание рецепта"""
@@ -183,7 +185,7 @@ class ImgBase64Serializer(serializers.Field):
         format, imgstr = data.split(';base64,')
         ext = format.split('/')[-1]
 
-        return ContentFile(base64.b64decode(imgstr), name='image.' + ext)
+        return ContentFile(base64.b64decode(imgstr), name=IMG_FILE_NAME + ext)
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
@@ -263,4 +265,4 @@ class RecipeShoppingCartSerializer(serializers.ModelSerializer):
         ]
 
     def get_image(self, obj):
-        return f'{MEDIA_URL}{obj.image.name}'
+        return get_image(self, obj)

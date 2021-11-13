@@ -163,3 +163,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Constants
+FONT_NAME = 'arial.ttf'
+PAGE_SIZE = 6
+MAX_PAGE_SIZE = 100
+PAGE_SIZE_QUERY_PARAM = 'limit'
+PDF_FILE_NAME = 'shoplist.pdf'
+IMG_FILE_NAME = 'image.'
