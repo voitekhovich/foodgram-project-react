@@ -5,5 +5,3 @@ venv/
 *.sqlite3
 Dockerfile
 *.json
-
-.gitkeep

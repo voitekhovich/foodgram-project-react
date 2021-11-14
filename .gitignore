@@ -134,5 +134,4 @@ dmypy.json
 .vscode/
 migrations/
 media/
-static/
 db.json
