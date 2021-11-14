@@ -1,7 +1,6 @@
-static/
-media/
-venv/
+src/static/
+src/media/
+src/venv/
 
-*.sqlite3
+src/*.sqlite3
 Dockerfile
-*.json

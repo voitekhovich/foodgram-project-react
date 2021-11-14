@@ -5,6 +5,7 @@ from app.models import (
 from foodgram.settings import (
     PAGE_SIZE, MAX_PAGE_SIZE, PAGE_SIZE_QUERY_PARAM, PDF_FILE_NAME)
 
+from .constants import Actions, HTTPMethods
 from .permissions import IsOwnerOrReadOnly
 from .filters import RecipeFilter, IngredientFilter
 from .serializers import (
@@ -20,13 +21,14 @@ from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework import serializers, permissions, viewsets, status
+from rest_framework import permissions, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 
 from djoser.views import UserViewSet
+from django.http import FileResponse
 
 User = get_user_model()
 
@@ -46,7 +48,7 @@ class CustomUserViewSet(UserViewSet):
     pagination_class = SetLimitPagination
 
     def get_serializer_class(self):
-        if self.action == 'subscriptions':
+        if self.action == Actions.SUBSCRIPTIONS:
             return SubscriptionsSerializer
         return super().get_serializer_class()
 
@@ -64,7 +66,7 @@ class CustomUserViewSet(UserViewSet):
         serializer = self.get_serializer(authors, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=('get', 'delete'))
+    @action(detail=True, methods=(HTTPMethods.GET, HTTPMethods.DELETE))
     def subscribe(self, request, id=None):
         """Подписаться/отписаться на автора."""
 
@@ -75,11 +77,7 @@ class CustomUserViewSet(UserViewSet):
             UserSubscribe.objects.filter(author=author, user=user).delete()
             return Response(status.HTTP_204_NO_CONTENT)
 
-        if UserSubscribe.objects.filter(author=author, user=user).exists():
-            raise serializers.ValidationError(
-                'Вы уже подписаны на этого автора')
-
-        UserSubscribe.objects.create(author=author, user=user)
+        UserSubscribe.objects.get_or_create(author=author, user=user)
         serializer = self.get_serializer(author)
         return Response(serializer.data)
 
@@ -96,26 +94,28 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_class = RecipeFilter
 
     def get_serializer_class(self):
-        if self.action in ('shopping_cart', 'favorite'):
+        if self.action in (Actions.SHOPPING_CART, Actions.FAVORITE):
             return RecipeShoppingCartSerializer
-        if self.action in ('create', 'update', 'partial_update'):
+        if self.action in (
+                Actions.CREATE, Actions.UPDATE, Actions.PARTIAL_UPDATE):
             return RecipeCreateSerializer
         return RecipeSerializer
 
     @action(detail=False)
     def download_shopping_cart(self, request):
         """Отправить PDF список."""
-        from django.http import FileResponse
         user = request.user
         recipes = Shopping_cart.objects.filter(user=user).values('recipe')
-        shop_list = RecipeIngredients.objects.filter(recipe__in=recipes)\
-            .values('ingredient__name', 'ingredient__measurement_unit')\
-            .annotate(Sum('amount')).order_by()
+        shop_list = (
+            RecipeIngredients.objects.filter(recipe__in=recipes)
+            .values('ingredient__name', 'ingredient__measurement_unit')
+            .annotate(Sum('amount'))
+        )
         buffer = create_pdf(shop_list)
         return FileResponse(
             buffer, as_attachment=True, filename=PDF_FILE_NAME)
 
-    @action(detail=True, methods=('get', 'delete'))
+    @action(detail=True, methods=(HTTPMethods.GET, HTTPMethods.DELETE))
     def shopping_cart(self, request, pk=None):
         """Добавить/удалить рецепт в список покупок."""
 
@@ -126,14 +126,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
             Shopping_cart.objects.filter(recipe=pk, user=user).delete()
             return Response(status.HTTP_204_NO_CONTENT)
 
-        if Shopping_cart.objects.filter(recipe=recipe, user=user).exists():
-            raise serializers.ValidationError('Рецепт уже в списке покупок')
-
-        Shopping_cart.objects.create(recipe=recipe, user=user)
+        Shopping_cart.objects.get_or_create(recipe=recipe, user=user)
         serializer = self.get_serializer(recipe)
         return Response(serializer.data)
 
-    @action(detail=True, methods=('get', 'delete'))
+    @action(detail=True, methods=(HTTPMethods.GET, HTTPMethods.DELETE))
     def favorite(self, request, pk=None):
         """Добавить/удалить рецепт в избранное."""
 
@@ -144,10 +141,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             Favorite.objects.filter(recipe=pk, user=user).delete()
             return Response(status.HTTP_204_NO_CONTENT)
 
-        if Favorite.objects.filter(recipe=recipe, user=user).exists():
-            raise serializers.ValidationError('Рецепт уже в избранном')
-
-        Favorite.objects.create(recipe=recipe, user=user)
+        Favorite.objects.get_or_create(recipe=recipe, user=user)
         serializer = self.get_serializer(recipe)
         return Response(serializer.data)
 

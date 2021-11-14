@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.constraints import UniqueConstraint
 from django.contrib.auth import get_user_model
 from pytils.translit import slugify
 
@@ -70,15 +71,16 @@ class RecipeIngredients(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,)
     amount = models.IntegerField('Количество',)
 
+    def __str__(self):
+        return f'{self.recipe} - {self.ingredient} - {self.amount}'
+
     class Meta:
         verbose_name = 'Ингредиенты рецептов'
         verbose_name_plural = 'Ингредиенты рецептов'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['ingredient', 'recipe'],
-                name='unique_ingredient_recipe'
-            )
-        ]
+        UniqueConstraint(
+            fields=('ingredient', 'recipe'),
+            name='unique_ingredient_recipe'
+        )
 
 
 class Shopping_cart(models.Model):
@@ -90,15 +92,16 @@ class Shopping_cart(models.Model):
         User, related_name='shopping_carts', on_delete=models.CASCADE,
         verbose_name='Пользователь',)
 
+    def __str__(self):
+        return f'{self.user.username} - {self.recipe}'
+
     class Meta:
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Список покупок'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['recipe', 'user'],
-                name='unique_recipe_user'
-            )
-        ]
+        UniqueConstraint(
+            fields=('recipe', 'user'),
+            name='unique_recipe_user'
+        )
 
 
 class Favorite(models.Model):
@@ -110,15 +113,16 @@ class Favorite(models.Model):
         Recipe, related_name='favorites', on_delete=models.CASCADE,
         verbose_name='Рецепт',)
 
+    def __str__(self):
+        return f'{self.user.username} - {self.recipe}'
+
     class Meta:
         verbose_name = 'Избранные рецепты'
         verbose_name_plural = 'Избранные рецепты'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'recipe'],
-                name='unique_user_recipe'
-            )
-        ]
+        UniqueConstraint(
+            fields=('user', 'recipe'),
+            name='unique_user_recipe'
+        )
 
 
 class UserSubscribe(models.Model):
@@ -130,12 +134,13 @@ class UserSubscribe(models.Model):
         User, related_name='following', on_delete=models.CASCADE,
         verbose_name='Подписки')
 
+    def __str__(self):
+        return f'{self.user.username} - {self.author.username}'
+
     class Meta:
         verbose_name = 'Подписка на пользователя'
         verbose_name_plural = 'Подписка на пользователя'
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user', 'author'],
-                name='unique_user_author'
-            )
-        ]
+        UniqueConstraint(
+            fields=('user', 'author'),
+            name='unique_user_author'
+        )

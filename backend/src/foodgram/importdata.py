@@ -2,6 +2,7 @@ import csv
 from app.models import Ingredient
 
 filename = '../data/ingredients.csv'
+# это решение мне не нравиться, думаю чем заменить :]
 
 
 def load():

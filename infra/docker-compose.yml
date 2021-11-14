@@ -12,7 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
-      - ../backend/.env
+      - ../backend/src/.env
   
   web:
     build: ../backend
@@ -20,14 +20,14 @@ services:
     volumes:
       - static_value:/code/static
       - media_value:/code/media
-      - ../backend/static/arial.ttf:/code/static/arial.ttf
+      - ../backend/src/static/arial.ttf:/code/static/arial.ttf
       - ../data:/code/data
     ports:
       - "8000:8000"
     depends_on:
       - db
     env_file:
-      - ../backend/.env
+      - ../backend/src/.env
 
   frontend:
     build:
