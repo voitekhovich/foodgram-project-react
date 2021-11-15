@@ -1,13 +1,16 @@
-from foodgram.settings import STATIC_ROOT, FONT_NAME
-from pathlib import Path
 import io
-from borb.pdf.canvas.layout.page_layout.multi_column_layout import SingleColumnLayout
+from pathlib import Path
+
+from borb.pdf.canvas.font.font import Font
+from borb.pdf.canvas.font.simple_font.true_type_font import TrueTypeFont
+from borb.pdf.canvas.layout.page_layout.multi_column_layout import \
+    SingleColumnLayout
 from borb.pdf.canvas.layout.text.paragraph import Paragraph
 from borb.pdf.document import Document
 from borb.pdf.page.page import Page
 from borb.pdf.pdf import PDF
-from borb.pdf.canvas.font.simple_font.true_type_font import TrueTypeFont
-from borb.pdf.canvas.font.font import Font
+
+from foodgram.settings import FONT_NAME, STATIC_ROOT
 
 
 def create_pdf(shop_list):

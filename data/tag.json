@@ -1,0 +1,1 @@
+[{"model": "app.tag", "pk": 1, "fields": {"name": "Обед", "color": "#49B64E", "slug": "obed"}}, {"model": "app.tag", "pk": 2, "fields": {"name": "Ужин", "color": "#8775D2", "slug": "uzhin"}}, {"model": "app.tag", "pk": 3, "fields": {"name": "Завтрак", "color": "#EA9263", "slug": "zavtrak"}}]

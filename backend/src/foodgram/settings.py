@@ -1,6 +1,7 @@
 import os
-import environ
 from pathlib import Path
+
+import environ
 
 env = environ.Env()
 
@@ -82,7 +83,7 @@ DATABASES = {
     }
 }
 
-DATABASES['default'] = DATABASES['dev' if DEBUG == 'True' else 'prod']
+DATABASES['default'] = DATABASES[os.environ.get('ENV')]
 
 
 # Password validation

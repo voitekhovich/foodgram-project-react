@@ -1,5 +1,6 @@
-from app.models import Ingredient, Recipe, Tag
 from django_filters import rest_framework as filters
+
+from app.models import Ingredient, Recipe, Tag
 
 
 class CharInFilter(filters.MultipleChoiceFilter, filters.CharFilter):

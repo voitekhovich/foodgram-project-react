@@ -1,14 +1,13 @@
-from app.models import (
-    Favorite, Recipe, RecipeIngredients, Shopping_cart, Tag, Ingredient,
-    UserSubscribe)
-from foodgram.settings import MEDIA_URL, IMG_FILE_NAME
 import base64
 
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
+
+from app.models import (Favorite, Ingredient, Recipe, RecipeIngredients,
+                        Shopping_cart, Tag, UserSubscribe)
+from foodgram.settings import IMG_FILE_NAME, MEDIA_URL
 
 User = get_user_model()
 
@@ -257,12 +256,12 @@ class RecipeShoppingCartSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
 
-        validators = [
+        validators = (
             UniqueTogetherValidator(
                 queryset=Shopping_cart.objects.all(),
                 fields=('recipe', 'user')
-            )
-        ]
+            ),
+        )
 
     def get_image(self, obj):
         return get_image(self, obj)

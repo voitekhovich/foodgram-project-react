@@ -1,34 +1,26 @@
-from app.models import (
-    Ingredient, Recipe, RecipeIngredients, Shopping_cart, Tag, Favorite,
-    UserSubscribe)
-
-from foodgram.settings import (
-    PAGE_SIZE, MAX_PAGE_SIZE, PAGE_SIZE_QUERY_PARAM, PDF_FILE_NAME)
-
-from .constants import Actions, HTTPMethods
-from .permissions import IsOwnerOrReadOnly
-from .filters import RecipeFilter, IngredientFilter
-from .serializers import (
-    RecipeCreateSerializer, RecipeSerializer, SubscriptionsSerializer,
-    TagSerializer,
-    RecipeShoppingCartSerializer,
-    IngredientSerializer)
-from .services import create_pdf
-
-from rest_framework.generics import get_object_or_404
-
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
+from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
-
-from rest_framework import permissions, viewsets, status
+from djoser.views import UserViewSet
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from rest_framework.generics import get_object_or_404
 
-from djoser.views import UserViewSet
-from django.http import FileResponse
+from app.models import (Favorite, Ingredient, Recipe, RecipeIngredients,
+                        Shopping_cart, Tag, UserSubscribe)
+from foodgram.settings import (MAX_PAGE_SIZE, PAGE_SIZE, PAGE_SIZE_QUERY_PARAM,
+                               PDF_FILE_NAME)
+
+from .constants import Actions, HTTPMethods
+from .filters import IngredientFilter, RecipeFilter
+from .permissions import IsOwnerOrReadOnly
+from .serializers import (IngredientSerializer, RecipeCreateSerializer,
+                          RecipeSerializer, RecipeShoppingCartSerializer,
+                          SubscriptionsSerializer, TagSerializer)
+from .services import create_pdf
 
 User = get_user_model()
 
