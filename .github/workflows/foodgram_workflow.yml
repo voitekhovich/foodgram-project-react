@@ -9,9 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Chenge context
-        with:
-          context: ./backend/
+      - context: ./backend/
       - name: Check out the repo
         uses: actions/checkout@v2 # Проверяет доступность репозитория DockerHub для workflow
       - name: Set up Docker Buildx
