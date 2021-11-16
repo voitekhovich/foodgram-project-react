@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - context: ./backend/
       - name: Check out the repo
         uses: actions/checkout@v2 # Проверяет доступность репозитория DockerHub для workflow
       - name: Set up Docker Buildx
@@ -22,6 +21,7 @@ jobs:
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2 # Выполняет push образа в DockerHub 
         with:
+          context: ./backend/
           push: true
           tags: voitekhovich/foodgram
 
