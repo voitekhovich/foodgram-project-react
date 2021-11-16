@@ -85,7 +85,7 @@ class RecipeIngredients(models.Model):
         return f'{self.recipe} - {self.ingredient} - {self.amount}'
 
 
-class Shopping_cart(models.Model):
+class ShoppingCart(models.Model):
     """Список покупок"""
     recipe = models.ForeignKey(
         Recipe, related_name='shopping_carts', on_delete=models.CASCADE,

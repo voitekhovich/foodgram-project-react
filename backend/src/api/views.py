@@ -10,16 +10,16 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from app.models import (Favorite, Ingredient, Recipe, RecipeIngredients,
-                        Shopping_cart, Tag, UserSubscribe)
+                        ShoppingCart, Tag, UserSubscribe)
 from foodgram.settings import (MAX_PAGE_SIZE, PAGE_SIZE, PAGE_SIZE_QUERY_PARAM,
                                PDF_FILE_NAME)
 
 from .constants import Actions, HTTPMethods
 from .filters import IngredientFilter, RecipeFilter
 from .permissions import IsOwnerOrReadOnly
-from .serializers import (
-    IngredientSerializer, RecipeCreateSerializer, RecipeSerializer,
-    RecipeShoppingCartSerializer, SubscriptionsSerializer, TagSerializer)
+from .serializers import (IngredientSerializer, RecipeCreateSerializer,
+                          RecipeSerializer, RecipeShoppingCartSerializer,
+                          SubscriptionsSerializer, TagSerializer)
 from .services import create_pdf
 
 User = get_user_model()
@@ -97,7 +97,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def download_shopping_cart(self, request):
         """Отправить PDF список."""
         user = request.user
-        recipes = Shopping_cart.objects.filter(user=user).values('recipe')
+        recipes = ShoppingCart.objects.filter(user=user).values('recipe')
         shop_list = (
             RecipeIngredients.objects.filter(recipe__in=recipes)
             .values('ingredient__name', 'ingredient__measurement_unit')
@@ -115,10 +115,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = request.user
 
         if request.method == 'DELETE':
-            Shopping_cart.objects.filter(recipe=pk, user=user).delete()
+            ShoppingCart.objects.filter(recipe=pk, user=user).delete()
             return Response(status.HTTP_204_NO_CONTENT)
 
-        Shopping_cart.objects.get_or_create(recipe=recipe, user=user)
+        ShoppingCart.objects.get_or_create(recipe=recipe, user=user)
         serializer = self.get_serializer(recipe)
         return Response(serializer.data)
 

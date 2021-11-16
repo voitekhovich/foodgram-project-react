@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from app.models import (Favorite, Ingredient, Recipe, RecipeIngredients,
-                        Shopping_cart, Tag, UserSubscribe)
+                        ShoppingCart, Tag, UserSubscribe)
 from foodgram.settings import IMG_FILE_NAME, MEDIA_URL
 
 User = get_user_model()
@@ -162,7 +162,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return Shopping_cart.objects.filter(user=user, recipe=obj).exists()
+        return ShoppingCart.objects.filter(user=user, recipe=obj).exists()
 
     def get_image(self, obj):
         return get_image(self, obj)
@@ -258,7 +258,7 @@ class RecipeShoppingCartSerializer(serializers.ModelSerializer):
 
         validators = (
             UniqueTogetherValidator(
-                queryset=Shopping_cart.objects.all(),
+                queryset=ShoppingCart.objects.all(),
                 fields=('recipe', 'user')
             ),
         )
