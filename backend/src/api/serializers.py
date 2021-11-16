@@ -7,7 +7,7 @@ from rest_framework.validators import UniqueTogetherValidator
 
 from app.models import (Favorite, Ingredient, Recipe, RecipeIngredients,
                         ShoppingCart, Tag, UserSubscribe)
-from foodgram.settings import IMG_FILE_NAME, MEDIA_URL
+from foodgram.settings import IMG_FILE_NAME, MEDIA_URL, VALID_EXTENSIONS
 
 User = get_user_model()
 
@@ -183,6 +183,11 @@ class ImgBase64Serializer(serializers.Field):
 
         format, imgstr = data.split(';base64,')
         ext = format.split('/')[-1]
+
+        if not ext.lower() in VALID_EXTENSIONS:
+            raise serializers.ValidationError({
+                'image': f'{ext} - неверный формат файла'
+            })
 
         return ContentFile(base64.b64decode(imgstr), name=IMG_FILE_NAME + ext)
 
