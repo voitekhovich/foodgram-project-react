@@ -72,20 +72,25 @@
 
 # Установка и запуск:
 ## Автоматический запуск:
-• На удалённом сервере установить Doker: 'sudo apt install docker.io'
-• Установите docker-compose: 'https://docs.docker.com/compose/install/'
-• Положить в домашнюю дирикторию сервера:
+- На удалённом сервере установить Doker: ```'sudo apt install docker.io'```
+- Установите docker-compose: 'https://docs.docker.com/compose/install/'
+- Положить в домашнюю дирикторию сервера:
+```
     'infra/docker-compose.yaml',
     'infra/nginx.conf',
     'data/',
     'docs/',
     'frontend/'
-• Выполнить команды:
+```
+- Выполнить команды:
+```
     'docker-compose up -d --build'
     'docker-compose web make run'
+```
 ***Необходим заполненный файл .env в src (смотри ниже)***
 
 Структура файла .env:
+```
     ENV=
     DEBUG=
     SECRET_KEY=
@@ -95,26 +100,30 @@
     POSTGRES_PASSWORD=
     DB_HOST=
     DB_PORT=
-
+```
 ### В кратце, что происходит:
-На сервере поднимается три контейнера: postgres, nginx и проект. И frontend, который делает свои дела и падает (в хорошем смылсе). Nginx принимает запросы на :80 порт и переадресует запросы на бекенд (gunicorn) :8000. Здесь же раздаётся статика и фронтенд. Команда make run запускает создание миграций, статики, загружает в БД первоначальные данные и создаёт супервользователя.
+На сервере поднимается три контейнера: postgres, nginx и проект. И frontend, который делает свои дела и падает (в хорошем смылсе). Nginx принимает запросы на :80 порт и переадресует запросы на бекенд (gunicorn) :8000. Здесь же раздаётся статика и фронтенд. Команда **make run** запускает создание миграций, статики, загружает в БД первоначальные данные и создаёт супервользователя.
 
 ## Ручной запуск (локально):
-• Забираем проект: 'git clone'
-• Переходим в каталог backend/src/
-• Изолируем проект: 'python -m venv venv && . ./venv/bin/activate'
-• Устанавливаем зависимости: 'pip install -r requirements.txt'
-• Делаем миграции:
+- Забираем проект: ```'git clone'```
+- Переходим в каталог backend/src/
+- Изолируем проект: ```'python -m venv venv && . ./venv/bin/activate'```
+- Устанавливаем зависимости: ```'pip install -r requirements.txt'```
+- Делаем миграции:
+```
     python manage.py makemigrations auth
-	python manage.py makemigrations app
-	python manage.py migrate
-• Подтягиваем статику: 'python manage.py collectstatic'
-• Загружаем данные: 
-    python manage.py loaddata tag.json
+    python manage.py makemigrations app
+    python manage.py migrate
+```
+- Подтягиваем статику: ```'python manage.py collectstatic'```
+- Загружаем данные: 
+```
+	python manage.py loaddata tag.json
 	python manage.py loaddata ingredient.json
-• Создаём суперпользователя: 'python manage.py createsuperuser'
-• Запускаем контейнеры (фронт и nginx) из local: 'docker-compose up -d --build'
-• Запускаемся: 'python manage.py runserver'
+```
+- Создаём суперпользователя: ```'python manage.py createsuperuser'```
+- Запускаем контейнеры (фронт и nginx) из local: ```'docker-compose up -d --build'```
+- Запускаемся: ```'python manage.py runserver'```
 
 
 ![example workflow](https://github.com/voitekhovich/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
