@@ -15,7 +15,7 @@ services:
       - ./.env
   
   web:
-    image: voitekhovich:foodgram
+    image: voitekhovich/foodgram
     restart: always
     command: gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000
     volumes:
