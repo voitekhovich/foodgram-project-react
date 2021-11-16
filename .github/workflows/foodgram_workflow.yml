@@ -40,7 +40,6 @@ jobs:
           script: |
             sudo docker-compose stop
             sudo docker-compose rm web
-            rm .env
             touch .env
             echo ENV=${{ secrets.ENV }} >> .env
             echo DEBUG=${{ secrets.DEBUG }} >> .env
