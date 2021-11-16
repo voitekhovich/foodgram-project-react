@@ -5,5 +5,3 @@ COPY requirements.txt /code
 RUN pip install -r /code/requirements.txt
 COPY ./src /code
 WORKDIR /code
-# RUN ./run.sh
-CMD gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000

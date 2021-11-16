@@ -1,6 +1,8 @@
-src/static/
+src/static/admin/
+src/static/rest_framework/
 src/media/
 src/venv/
 
-*.sqlite3
+src/.env
+src/db.sqlite3
 Dockerfile

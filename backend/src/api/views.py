@@ -17,9 +17,9 @@ from foodgram.settings import (MAX_PAGE_SIZE, PAGE_SIZE, PAGE_SIZE_QUERY_PARAM,
 from .constants import Actions, HTTPMethods
 from .filters import IngredientFilter, RecipeFilter
 from .permissions import IsOwnerOrReadOnly
-from .serializers import (IngredientSerializer, RecipeCreateSerializer,
-                          RecipeSerializer, RecipeShoppingCartSerializer,
-                          SubscriptionsSerializer, TagSerializer)
+from .serializers import (
+    IngredientSerializer, RecipeCreateSerializer, RecipeSerializer,
+    RecipeShoppingCartSerializer, SubscriptionsSerializer, TagSerializer)
 from .services import create_pdf
 
 User = get_user_model()
