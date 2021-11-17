@@ -9,6 +9,7 @@ from borb.pdf.canvas.layout.text.paragraph import Paragraph
 from borb.pdf.document import Document
 from borb.pdf.page.page import Page
 from borb.pdf.pdf import PDF
+
 from foodgram.settings import FONT_NAME, STATIC_ROOT
 
 

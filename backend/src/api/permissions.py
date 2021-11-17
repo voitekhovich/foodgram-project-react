@@ -1,5 +1,6 @@
-from rest_framework import permissions
 import re
+
+from rest_framework import permissions
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
