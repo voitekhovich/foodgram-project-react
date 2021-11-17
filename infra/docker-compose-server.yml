@@ -1,3 +1,6 @@
+# Скачивает образ приложения web из docker hub.
+# Используется для запуска проета на облачном сервере.
+
 version: '3.3'
 
 volumes:
@@ -15,7 +18,7 @@ services:
       - ./.env
   
   web:
-    image: voitekhovich/foodgram
+    image: voitekhovich/foodgram:1.0.1
     restart: always
     command: gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000
     volumes:
@@ -25,8 +28,6 @@ services:
       - ./data/tag.json:/code/tag.json
     env_file:
       - ./.env
-    ports:
-      - "8000:8000"
     depends_on:
       - db
 
@@ -43,6 +44,7 @@ services:
     image: nginx:1.19.3
     ports:
       - 80:80
+      - 443:443
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ./frontend/build:/usr/share/nginx/html
@@ -50,5 +52,16 @@ services:
       - ./docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
       - static_value:/var/html/static
       - media_value:/var/html/media
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
     depends_on:
       - web
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    depends_on:
+      - nginx
