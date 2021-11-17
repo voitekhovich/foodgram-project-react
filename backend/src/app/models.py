@@ -3,6 +3,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
 from pytils.translit import slugify
+
 from foodgram.settings import MAX_VALUE, MIN_VALUE
 
 User = get_user_model()
