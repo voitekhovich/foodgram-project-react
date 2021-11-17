@@ -172,3 +172,5 @@ PAGE_SIZE_QUERY_PARAM = 'limit'
 PDF_FILE_NAME = 'shoplist.pdf'
 IMG_FILE_NAME = 'image.'
 VALID_EXTENSIONS = ['png', 'jpg', 'jpeg', 'bmp']
+MAX_VALUE = 99999
+MIN_VALUE = 0

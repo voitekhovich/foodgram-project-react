@@ -1,7 +1,9 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
 from pytils.translit import slugify
+from foodgram.settings import MAX_VALUE, MIN_VALUE
 
 User = get_user_model()
 User._meta.get_field('email')._unique = True
@@ -49,7 +51,12 @@ class Recipe(models.Model):
     image = models.ImageField('Ссылка на картинку', upload_to='image/',
                               blank=True, null=True,)
     text = models.TextField('Описание')
-    cooking_time = models.IntegerField('Время приготовления (мин)')
+    cooking_time = models.IntegerField(
+        'Время приготовления (мин)',
+        validators=[
+            MaxValueValidator(MAX_VALUE),
+            MinValueValidator(MIN_VALUE)
+        ])
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
     ingredients = models.ManyToManyField(
         Ingredient, through='RecipeIngredients', verbose_name='Ингредиенты',)
@@ -69,7 +76,12 @@ class RecipeIngredients(models.Model):
     ingredient = models.ForeignKey(
         Ingredient, on_delete=models.CASCADE, verbose_name='Ингредиент')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,)
-    amount = models.IntegerField('Количество',)
+    amount = models.IntegerField(
+        'Количество',
+        validators=[
+            MaxValueValidator(MAX_VALUE),
+            MinValueValidator(MIN_VALUE)
+        ])
 
     class Meta:
         verbose_name = 'Ингредиенты рецептов'
