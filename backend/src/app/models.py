@@ -48,8 +48,7 @@ class Recipe(models.Model):
         User, related_name='recipes', on_delete=models.CASCADE,
         verbose_name='Автор рецепта',)
     name = models.CharField('Название рецепта', max_length=200,)
-    image = models.ImageField('Ссылка на картинку', upload_to='image/',
-                              blank=True, null=True,)
+    image = models.ImageField('Ссылка на картинку', upload_to='image/',)
     text = models.TextField('Описание')
     cooking_time = models.IntegerField(
         'Время приготовления (мин)',

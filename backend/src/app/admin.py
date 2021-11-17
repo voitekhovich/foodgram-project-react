@@ -11,11 +11,12 @@ class RecipeIngredientsInline(admin.TabularInline):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author',)
+    list_display = ('id', 'name', 'author',)
     list_display_links = ('name',)
-    list_filter = ('author', 'name', 'tags')
+    list_filter = ('tags',)
     inlines = (RecipeIngredientsInline,)
     readonly_fields = ('favorit_count',)
+    search_fields = ('author__username', 'author__email', 'name')
 
     @admin.display(description='Добавлений в избранное')
     def favorit_count(self, instance):
@@ -24,36 +25,37 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(RecipeIngredients)
 class RecipeIngredientsAdmin(admin.ModelAdmin):
-    list_display = ('ingredient', 'recipe', 'amount',)
+    list_display = ('id', 'ingredient', 'recipe', 'amount',)
+    search_fields = ('ingredient__name', 'recipe__name',)
 
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'color', 'slug')
+    list_display = ('id', 'name', 'color', 'slug')
     list_display_links = ('name',)
     search_fields = ('name',)
 
 
 @admin.register(Ingredient)
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('name', 'measurement_unit',)
-    list_filter = ('name',)
+    list_display = ('id', 'name', 'measurement_unit',)
+    list_display_links = ('name',)
+    search_fields = ('name',)
 
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'recipe',)
-    list_filter = ('user__username', 'recipe__name',)
-    search_fields = ('user__username', 'recipe__name',)
+    search_fields = ('user__username', 'user__email', 'recipe__name',)
 
 
 @admin.register(ShoppingCart)
 class ShoppingCartAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'recipe',)
-    list_filter = ('user__username', 'recipe__name',)
-    search_fields = ('user__username', 'recipe__name',)
+    search_fields = ('user__username', 'user__email', 'recipe__name',)
 
 
 @admin.register(UserSubscribe)
 class UserSubscribeAdmin(admin.ModelAdmin):
-    list_display = ('user', 'author')
+    list_display = ('id', 'user', 'author')
+    search_fields = ('user__username', 'user__email', 'author__email')
